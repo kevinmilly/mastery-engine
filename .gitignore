@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+env/
+venv/
+ENV/
+
+# Sensitive files
+oauth-client.json
+service-account.json
+.claude/
+.env
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
