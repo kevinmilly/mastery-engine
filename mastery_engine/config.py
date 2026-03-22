@@ -5,14 +5,15 @@ DEFAULT_MAX_TOPICS_PER_TIER = 10
 ESTIMATED_MINUTES_MIN = 15
 ESTIMATED_MINUTES_MAX = 25
 STATE_DIR = Path.home() / ".mastery-engine" / "runs"
+CURRICULA_DIR = Path.cwd() / "curricula"
 CONFIG_FILE = Path.home() / ".mastery-engine" / "config.json"
 
 # ── Model tiers ───────────────────────────────────────────────────────────────
 # HIGH: tasks requiring sustained reasoning, domain judgment, and teaching quality
 # LOW:  tasks that are structural, extractive, or JSON-formatting work
 
-GEMINI_HIGH = "gemini-2.5-pro-preview-05-06"
-GEMINI_LOW  = "gemini-2.0-flash"
+GEMINI_HIGH = "gemini-2.5-pro"
+GEMINI_LOW  = "gemini-2.5-flash"
 
 OPENAI_HIGH = "gpt-4o"
 OPENAI_LOW  = "gpt-4o-mini"
@@ -24,8 +25,8 @@ CLAUDE_LOW  = "claude-haiku-4-5-20251001"
 HIGH_TASKS = {"lesson", "practice_set", "capstone"}
 LOW_TASKS  = {"syllabus", "repair", "overview", "glossary", "analogy_extraction", "topic_summary"}
 
-# Fallback chain order (Gemini always first — uses CLI auth, not API key)
-FALLBACK_ORDER = ["gemini", "openai", "anthropic"]
+# Fallback chain order
+FALLBACK_ORDER = ["gemini", "anthropic", "openai"]
 
 # ── Retry ─────────────────────────────────────────────────────────────────────
 RETRY_BASE_DELAY = 2

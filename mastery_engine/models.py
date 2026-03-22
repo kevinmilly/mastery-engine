@@ -7,10 +7,10 @@ from mastery_engine.config import ESTIMATED_MINUTES_MIN, ESTIMATED_MINUTES_MAX, 
 class TopicStatus(str, Enum):
     PENDING = "pending"
     LESSON_GENERATED = "lesson_generated"
-    LESSON_DOC_CREATED = "lesson_doc_created"
+    LESSON_FILE_CREATED = "lesson_file_created"
     PRACTICE_GENERATED = "practice_generated"
-    PRACTICE_DOC_CREATED = "practice_doc_created"
-    SHEET_UPDATED = "sheet_updated"
+    PRACTICE_FILE_CREATED = "practice_file_created"
+    INDEX_UPDATED = "index_updated"
     COMPLETED = "completed"
     FAILED = "failed"
 
@@ -19,7 +19,7 @@ class TierStatus(str, Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     CAPSTONE_GENERATED = "capstone_generated"
-    CAPSTONE_DOC_CREATED = "capstone_doc_created"
+    CAPSTONE_FILE_CREATED = "capstone_file_created"
     COMPLETED = "completed"
     FAILED = "failed"
 
@@ -29,15 +29,15 @@ class RunStatus(str, Enum):
     SYLLABUS_GENERATED = "syllabus_generated"
     OVERVIEW_CREATED = "overview_created"
     GLOSSARY_CREATED = "glossary_created"
-    SPREADSHEET_SEEDED = "spreadsheet_seeded"
+    INDEX_SEEDED = "index_seeded"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
 
 
-class DocRef(BaseModel):
-    id: str = ""
-    url: str = ""
+class FileRef(BaseModel):
+    id: str = ""  # For local, this is the relative path
+    url: str = "" # For local, this is also the relative path
 
 
 class RawTopic(BaseModel):
@@ -70,9 +70,8 @@ class Topic(BaseModel):
     sequence: int
     estimated_minutes: int
     status: TopicStatus = TopicStatus.PENDING
-    lesson_doc: DocRef = DocRef()
-    practice_doc: DocRef = DocRef()
-    sheet_row: int = 0
+    lesson_file: FileRef = FileRef()
+    practice_file: FileRef = FileRef()
     error: Optional[str] = None
     retry_count: int = 0
 
@@ -88,8 +87,7 @@ class Topic(BaseModel):
 
 class TierState(BaseModel):
     status: TierStatus = TierStatus.PENDING
-    capstone_doc: DocRef = DocRef()
-    sheet_row: int = 0
+    capstone_file: FileRef = FileRef()
 
 
 class RunConfig(BaseModel):

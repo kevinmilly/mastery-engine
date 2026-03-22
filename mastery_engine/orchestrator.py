@@ -2,16 +2,17 @@ from __future__ import annotations
 
 import hashlib
 from typing import Any
+from pathlib import Path
 
 from mastery_engine import logging_utils as log
-from mastery_engine.adapters.workspace_adapter import WorkspaceAdapter
+from mastery_engine.adapters.local_adapter import LocalAdapter, FileRef
 from mastery_engine.config import (
     TIERS, REPAIR_MAX_ATTEMPTS, RECENT_ANALOGIES_WINDOW, PRIOR_SUMMARIES_WINDOW,
-    DEFAULT_MIN_TOPICS_PER_TIER, DEFAULT_MAX_TOPICS_PER_TIER,
+    DEFAULT_MIN_TOPICS_PER_TIER, DEFAULT_MAX_TOPICS_PER_TIER, CURRICULA_DIR
 )
 from mastery_engine.llm_router import LLMRouter
 from mastery_engine.models import (
-    Topic, TopicStatus, TierStatus, RunStatus, DocRef,
+    Topic, TopicStatus, TierStatus, RunStatus, FileRef
 )
 from mastery_engine.prompts import (
     syllabus_prompt, repair_prompt, lesson_prompt, practice_set_prompt,
@@ -25,37 +26,27 @@ from mastery_engine.validation import (
     ValidationFailure, parse_syllabus_json, validate_syllabus, assign_topic_ids,
 )
 
-
-# Column mapping for tier tabs: A=Status B=Topic C=Lesson D=PracticeSet E=MasteryNote F=TopicID G=Capstone
-COL_STATUS = "A"
-COL_TOPIC = "B"
-COL_LESSON = "C"
-COL_PRACTICE = "D"
-COL_MASTERY_NOTE = "E"
-COL_TOPIC_ID = "F"
-COL_CAPSTONE = "G"
-
-HEADER_ROW = 1
-FIRST_DATA_ROW = 2
-
-
 class Orchestrator:
     def __init__(
         self,
         router: LLMRouter,
-        workspace: WorkspaceAdapter,
         state: RunState,
         dry_run: bool = False,
     ):
         self.router = router
-        self.workspace = workspace
         self.state = state
         self.dry_run = dry_run
-
-    # ── Top-level build ───────────────────────────────────────────────────────
+        self.output_dir: Path | None = None
+        self.adapter: LocalAdapter | None = None
 
     def build(self) -> None:
         s = self.state
+        self.output_dir = CURRICULA_DIR / s.run_id
+        self.adapter = LocalAdapter(self.output_dir)
+        
+        if not s.run_dir:
+            s.run_dir = str(self.output_dir)
+            s.save(s.state_path())
 
         if s.status == RunStatus.INITIALIZING:
             self._generate_syllabus()
@@ -67,7 +58,7 @@ class Orchestrator:
             self._create_glossary()
 
         if s.status == RunStatus.GLOSSARY_CREATED:
-            self._seed_spreadsheet()
+            self._seed_index()
 
         # Main topic loop
         s.status = RunStatus.IN_PROGRESS
@@ -76,12 +67,12 @@ class Orchestrator:
         for tier in TIERS:
             self._process_tier(tier)
 
-        self._finalize_summary()
+        self._finalize_index()
         s.status = RunStatus.COMPLETED
         s.save(s.state_path())
 
         log.section("Build Complete")
-        log.success(f"Dashboard: {s.spreadsheet.url}")
+        log.success(f"Output Directory: {self.output_dir}")
         log.success(f"Run ID: {s.run_id}")
 
     # ── Syllabus ──────────────────────────────────────────────────────────────
@@ -100,13 +91,7 @@ class Orchestrator:
         raw = self._call_llm("syllabus", prompt)
         syllabus_data = self._parse_and_validate_syllabus(raw)
 
-        # Use midpoint of range for estimated_minutes
-        estimated_minutes = (
-            s.config.min_topics_per_tier + s.config.max_topics_per_tier
-        ) // 2
-        # Actually use fixed 20 min (midpoint of 15-25)
         estimated_minutes = 20
-
         topic_dicts = assign_topic_ids(syllabus_data, estimated_minutes)
         s.topics = [Topic(**t) for t in topic_dicts]
 
@@ -141,8 +126,8 @@ class Orchestrator:
 
     def _create_overview(self) -> None:
         s = self.state
-        if s.overview_doc.id:
-            log.info("Overview doc already exists, skipping.")
+        if s.overview_doc.url:
+            log.info("Overview already exists, skipping.")
             s.status = RunStatus.OVERVIEW_CREATED
             return
 
@@ -152,21 +137,20 @@ class Orchestrator:
         content = self._call_llm("overview", prompt)
 
         if not self.dry_run:
-            doc = self.workspace.create_doc(f"Overview: {s.subject}")
-            self.workspace.write_doc(doc.id, content)
-            s.overview_doc = DocRef(id=doc.id, url=doc.url)
+            ref = self.adapter.write_file("Overview.md", content)
+            s.overview_doc = FileRef(id=ref.id, url=ref.url)
         else:
             log.section("Dry Run — Overview (sample)")
             log.console.print(content[:500] + "\n[dim]…truncated[/dim]")
 
         s.status = RunStatus.OVERVIEW_CREATED
         s.save(s.state_path())
-        log.success("Overview doc created")
+        log.success("Overview created")
 
     def _create_glossary(self) -> None:
         s = self.state
-        if s.glossary_doc.id:
-            log.info("Glossary doc already exists, skipping.")
+        if s.glossary_doc.url:
+            log.info("Glossary already exists, skipping.")
             s.status = RunStatus.GLOSSARY_CREATED
             return
 
@@ -176,88 +160,75 @@ class Orchestrator:
         content = self._call_llm("glossary", prompt)
 
         if not self.dry_run:
-            doc = self.workspace.create_doc(f"Glossary: {s.subject}")
-            self.workspace.write_doc(doc.id, content)
-            s.glossary_doc = DocRef(id=doc.id, url=doc.url)
+            ref = self.adapter.write_file("Glossary.md", content)
+            s.glossary_doc = FileRef(id=ref.id, url=ref.url)
 
         s.status = RunStatus.GLOSSARY_CREATED
         s.save(s.state_path())
-        log.success("Glossary doc created")
+        log.success("Glossary created")
 
-    # ── Spreadsheet ───────────────────────────────────────────────────────────
+    # ── Index Generation (Replaces Spreadsheet) ───────────────────────────────
 
-    def _seed_spreadsheet(self) -> None:
+    def _seed_index(self) -> None:
         s = self.state
-        if s.spreadsheet.id:
-            log.info("Spreadsheet already exists, skipping seed.")
-            s.status = RunStatus.SPREADSHEET_SEEDED
-            return
-
-        log.info("Creating Sheets dashboard…")
-
-        # Always assign row numbers (needed for resume logic), even in dry-run
-        for tier in TIERS:
-            tier_topics = sorted(
-                [t for t in s.topics if t.tier == tier], key=lambda t: t.sequence
-            )
-            for i, topic in enumerate(tier_topics):
-                topic.sheet_row = FIRST_DATA_ROW + i
-            capstone_row = FIRST_DATA_ROW + len(tier_topics)
-            s.tiers[tier].sheet_row = capstone_row
-
+        log.info("Initializing INDEX.md…")
+        
         if self.dry_run:
-            total_docs = len(s.topics) * 2 + 3 + 1 + 1
+            total_files = len(s.topics) * 2 + 3 + 1 + 1
             log.info(
-                f"Would create: 1 spreadsheet, {len(s.topics)} lesson docs, "
-                f"{len(s.topics)} practice sets, 3 capstones, 1 overview, 1 glossary "
-                f"({total_docs} total docs)"
+                f"Would create: {len(s.topics)} lessons, "
+                f"{len(s.topics)} practice sets, 3 capstones, 1 overview, 1 glossary, 1 INDEX.md "
+                f"({total_files} total files)"
             )
-            s.status = RunStatus.SPREADSHEET_SEEDED
+            s.status = RunStatus.INDEX_SEEDED
             s.save(s.state_path())
             return
 
-        sheet_ref = self.workspace.create_spreadsheet(f"Mastery: {s.subject}")
-        s.spreadsheet = DocRef(id=sheet_ref.id, url=sheet_ref.url)
-
-        # Create tabs in order (Summary already exists as default Sheet1 — rename it)
-        self.workspace.add_sheet(sheet_ref.id, "Summary")
-        for tier in TIERS:
-            self.workspace.add_sheet(sheet_ref.id, tier)
-
-        # Seed each tier tab — batch all cell writes per tier into one API call
-        for tier in TIERS:
-            tier_topics = sorted(
-                [t for t in s.topics if t.tier == tier], key=lambda t: t.sequence
-            )
-            headers = ["Status", "Topic", "Lesson", "Practice Set", "Mastery Note", "Topic ID", "Capstone"]
-            batch: list[tuple[str, str, str]] = []
-
-            for col_idx, header in enumerate(headers):
-                col = chr(ord("A") + col_idx)
-                batch.append((tier, f"{col}{HEADER_ROW}", header))
-
-            for topic in tier_topics:
-                row = topic.sheet_row
-                batch.append((tier, f"{COL_TOPIC}{row}", topic.title))
-                batch.append((tier, f"{COL_TOPIC_ID}{row}", topic.id))
-
-            capstone_row = s.tiers[tier].sheet_row
-            batch.append((tier, f"{COL_TOPIC}{capstone_row}", f"[Capstone: {tier}]"))
-
-            self.workspace.batch_update_cells(sheet_ref.id, batch)
-            self.workspace.bold_row(sheet_ref.id, tier, HEADER_ROW)
-            self.workspace.freeze_row(sheet_ref.id, tier)
-
-            # Checkbox validation on status column for data rows
-            last_row = FIRST_DATA_ROW + len(tier_topics) - 1
-            if last_row >= FIRST_DATA_ROW:
-                self.workspace.set_checkbox_validation(
-                    sheet_ref.id, tier, f"{COL_STATUS}{FIRST_DATA_ROW}:{COL_STATUS}{last_row}"
-                )
-
-        s.status = RunStatus.SPREADSHEET_SEEDED
+        self._update_index()
+        s.status = RunStatus.INDEX_SEEDED
         s.save(s.state_path())
-        log.success("Spreadsheet seeded")
+        log.success("INDEX.md initialized")
+
+    def _update_index(self) -> None:
+        s = self.state
+        
+        lines = [f"# Mastery: {s.subject}", ""]
+        lines.append(f"**Run ID:** `{s.run_id}`")
+        lines.append("")
+        
+        overview_link = f"[Curriculum Overview]({s.overview_doc.url})" if s.overview_doc.url else "Curriculum Overview (Pending)"
+        glossary_link = f"[Master Glossary]({s.glossary_doc.url})" if s.glossary_doc.url else "Master Glossary (Pending)"
+        
+        lines.append(f"- {overview_link}")
+        lines.append(f"- {glossary_link}")
+        lines.append("")
+        
+        lines.append("## Curriculum Map")
+        lines.append("")
+        
+        for tier in TIERS:
+            lines.append(f"### {tier}")
+            lines.append("| Status | Topic | Lesson | Practice |")
+            lines.append("| :--- | :--- | :--- | :--- |")
+            
+            tier_topics = sorted([t for t in s.topics if t.tier == tier], key=lambda t: t.sequence)
+            for t in tier_topics:
+                status_emoji = "✅" if t.status == TopicStatus.COMPLETED else "⏳"
+                lesson_link = f"[Read]({t.lesson_file.url})" if t.lesson_file.url else "---"
+                practice_link = f"[Practice]({t.practice_file.url})" if t.practice_file.url else "---"
+                lines.append(f"| {status_emoji} | {t.title} | {lesson_link} | {practice_link} |")
+            
+            # Capstone row
+            tier_state = s.tiers[tier]
+            capstone_link = f"[**Capstone: {tier}**]({tier_state.capstone_file.url})" if tier_state.capstone_file.url else f"**Capstone: {tier}** (Pending)"
+            lines.append(f"| | {capstone_link} | | |")
+            lines.append("")
+
+        self.adapter.write_file("INDEX.md", "\n".join(lines))
+
+    def _finalize_index(self) -> None:
+        self._update_index()
+        log.success("INDEX.md finalized")
 
     # ── Tier processing ───────────────────────────────────────────────────────
 
@@ -282,7 +253,7 @@ class Orchestrator:
             self._process_topic(topic, tier_topics)
 
         # Capstone after all topics in tier
-        if tier_state.status not in (TierStatus.CAPSTONE_DOC_CREATED, TierStatus.COMPLETED):
+        if tier_state.status not in (TierStatus.CAPSTONE_FILE_CREATED, TierStatus.COMPLETED):
             self._create_capstone(tier, tier_topics)
 
         tier_state.status = TierStatus.COMPLETED
@@ -302,7 +273,6 @@ class Orchestrator:
             if t.sequence < topic.sequence and t.status == TopicStatus.COMPLETED
         ]
 
-        # Prior summaries: bounded window of last N completed topics in same tier
         completed_in_tier = [
             t for t in tier_topics
             if t.sequence < topic.sequence and t.status == TopicStatus.COMPLETED
@@ -315,6 +285,9 @@ class Orchestrator:
 
         recent_analogies = s.context_carry.recent_analogies[-RECENT_ANALOGIES_WINDOW:]
 
+        # Create tier directory
+        tier_dir = topic.tier
+
         # ── Lesson ──
         if topic.status == TopicStatus.PENDING:
             lesson_text = self._call_llm("lesson", lesson_prompt(
@@ -325,28 +298,27 @@ class Orchestrator:
             s.save(s.state_path())
 
             if not self.dry_run:
-                doc = self.workspace.create_doc(f"{topic.tier} — {topic.title} | {s.subject}")
-                self.workspace.write_doc(doc.id, lesson_text)
-                topic.lesson_doc = DocRef(id=doc.id, url=doc.url)
-                topic.status = TopicStatus.LESSON_DOC_CREATED
+                filename = f"{tier_dir}/{topic.sequence:02d}-{topic.id}.md"
+                ref = self.adapter.write_file(filename, lesson_text)
+                topic.lesson_file = FileRef(id=ref.id, url=ref.url)
+                topic.status = TopicStatus.LESSON_FILE_CREATED
                 s.save(s.state_path())
 
-            # Extract analogy and summary (lightweight calls)
+            # Extract analogy and summary
             try:
                 analogy = self._call_llm("analogy_extraction", analogy_extraction_prompt(lesson_text)).strip()
                 if analogy:
                     s.context_carry.recent_analogies.append(analogy)
-                    # Keep window
                     s.context_carry.recent_analogies = s.context_carry.recent_analogies[-RECENT_ANALOGIES_WINDOW:]
 
                 summary = self._call_llm("topic_summary", topic_summary_prompt(lesson_text)).strip()
                 if summary:
                     s.context_carry.prior_topic_summaries[topic.id] = summary
             except Exception:
-                pass  # Non-critical: continue if extraction fails
+                pass 
 
         # ── Practice set ──
-        if topic.status in (TopicStatus.LESSON_GENERATED, TopicStatus.LESSON_DOC_CREATED):
+        if topic.status in (TopicStatus.LESSON_GENERATED, TopicStatus.LESSON_FILE_CREATED):
             practice_text = self._call_llm("practice_set", practice_set_prompt(
                 s.subject, topic.tier, topic.title, topic.description, prior_titles,
             ))
@@ -354,29 +326,16 @@ class Orchestrator:
             s.save(s.state_path())
 
             if not self.dry_run:
-                doc = self.workspace.create_doc(
-                    f"{topic.tier} — {topic.title} | Practice Set | {s.subject}"
-                )
-                self.workspace.write_doc(doc.id, practice_text)
-                topic.practice_doc = DocRef(id=doc.id, url=doc.url)
-                topic.status = TopicStatus.PRACTICE_DOC_CREATED
+                filename = f"{tier_dir}/{topic.sequence:02d}-{topic.id}-practice.md"
+                ref = self.adapter.write_file(filename, practice_text)
+                topic.practice_file = FileRef(id=ref.id, url=ref.url)
+                topic.status = TopicStatus.PRACTICE_FILE_CREATED
                 s.save(s.state_path())
 
-        # ── Sheet update ──
-        if topic.status == TopicStatus.PRACTICE_DOC_CREATED and not self.dry_run:
-            if topic.lesson_doc.url:
-                self.workspace.update_cell_hyperlink(
-                    s.spreadsheet.id, topic.tier,
-                    f"{COL_LESSON}{topic.sheet_row}",
-                    topic.lesson_doc.url, "Lesson",
-                )
-            if topic.practice_doc.url:
-                self.workspace.update_cell_hyperlink(
-                    s.spreadsheet.id, topic.tier,
-                    f"{COL_PRACTICE}{topic.sheet_row}",
-                    topic.practice_doc.url, "Practice",
-                )
-            topic.status = TopicStatus.SHEET_UPDATED
+        # Update index after each topic
+        if not self.dry_run:
+            self._update_index()
+            topic.status = TopicStatus.INDEX_UPDATED
             s.save(s.state_path())
 
         topic.status = TopicStatus.COMPLETED
@@ -387,9 +346,9 @@ class Orchestrator:
         s = self.state
         tier_state = s.tiers[tier]
 
-        if tier_state.capstone_doc.id:
-            log.info(f"  {tier} capstone doc already exists, skipping.")
-            tier_state.status = TierStatus.CAPSTONE_DOC_CREATED
+        if tier_state.capstone_file.url:
+            log.info(f"  {tier} capstone already exists, skipping.")
+            tier_state.status = TierStatus.CAPSTONE_FILE_CREATED
             return
 
         log.info(f"  Generating {tier} capstone…")
@@ -404,63 +363,35 @@ class Orchestrator:
         s.save(s.state_path())
 
         if not self.dry_run:
-            doc = self.workspace.create_doc(f"Capstone: {tier} — {s.subject}")
-            self.workspace.write_doc(doc.id, cap_text)
-            tier_state.capstone_doc = DocRef(id=doc.id, url=doc.url)
-            tier_state.status = TierStatus.CAPSTONE_DOC_CREATED
+            filename = f"{tier}/Capstone.md"
+            ref = self.adapter.write_file(filename, cap_text)
+            tier_state.capstone_file = FileRef(id=ref.id, url=ref.url)
+            tier_state.status = TierStatus.CAPSTONE_FILE_CREATED
+            self._update_index()
             s.save(s.state_path())
 
-            if tier_state.sheet_row and tier_state.capstone_doc.url:
-                self.workspace.update_cell_hyperlink(
-                    s.spreadsheet.id, tier,
-                    f"{COL_CAPSTONE}{tier_state.sheet_row}",
-                    tier_state.capstone_doc.url, "Capstone",
-                )
-
         log.success(f"  {tier} capstone created")
-
-    # ── Summary tab ───────────────────────────────────────────────────────────
-
-    def _finalize_summary(self) -> None:
-        s = self.state
-        if self.dry_run or not s.spreadsheet.id:
-            return
-
-        log.info("Finalizing Summary tab…")
-        batch: list[tuple[str, str, str]] = [
-            ("Summary", "A1", "Mastery Engine Dashboard"),
-            ("Summary", "A2", f"Subject: {s.subject}"),
-            ("Summary", "A4", "Overview"),
-            ("Summary", "A5", "Glossary"),
-            ("Summary", "A7", "Tier"),
-            ("Summary", "B7", "Completed"),
-            ("Summary", "C7", "Total"),
-        ]
-        if s.overview_doc.url:
-            batch.append(("Summary", "B4", f'=HYPERLINK("{s.overview_doc.url}","Open")'))
-        if s.glossary_doc.url:
-            batch.append(("Summary", "B5", f'=HYPERLINK("{s.glossary_doc.url}","Open")'))
-
-        row = 7
-        for tier in TIERS:
-            row += 1
-            tier_topics = [t for t in s.topics if t.tier == tier]
-            total = len(tier_topics)
-            first_data = FIRST_DATA_ROW
-            last_data = FIRST_DATA_ROW + total - 1
-            formula = f"=COUNTIF('{tier}'!{COL_STATUS}{first_data}:{COL_STATUS}{last_data},TRUE)"
-            batch.append(("Summary", f"A{row}", tier))
-            batch.append(("Summary", f"B{row}", formula))
-            batch.append(("Summary", f"C{row}", str(total)))
-
-        self.workspace.batch_update_cells(s.spreadsheet.id, batch)
-        self.workspace.bold_row(s.spreadsheet.id, "Summary", 1)
-        self.workspace.bold_row(s.spreadsheet.id, "Summary", 7)
-
-        s.save(s.state_path())
-        log.success("Summary tab finalized")
 
     # ── LLM helper ────────────────────────────────────────────────────────────
 
     def _call_llm(self, task: str, prompt: str) -> str:
+        if self.dry_run:
+            if task in ("syllabus", "repair"):
+                topics = []
+                for tier in TIERS:
+                    for i in range(1, 9):
+                        topics.append({
+                            "title": f"Sample {tier} Topic {i}",
+                            "description": f"Description for {tier} {i}",
+                            "tier": tier,
+                            "sequence": i
+                        })
+                import json
+                return json.dumps({"topics": topics})
+            if task == "analogy_extraction":
+                return "This is a sample analogy."
+            if task == "topic_summary":
+                return "This is a sample topic summary."
+            return f"Sample content for {task} on {self.state.subject}"
+            
         return self.router.call(task, prompt)

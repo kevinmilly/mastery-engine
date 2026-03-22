@@ -1,25 +1,31 @@
 """
 LLMRouter — automatic model selection and provider fallback chain.
 
-Anthropic is the primary provider for all tasks.
-Gemini (via Google API key) is the fallback for all tasks.
+Gemini Pro 2.5 is the primary provider for all tasks.
+Anthropic (via API key) is the first fallback.
+OpenAI (via API key) is the second fallback.
 
   HIGH tasks (lesson, practice_set, capstone) — need strong reasoning:
-    1. Anthropic — claude-sonnet-4-6        (if anthropic_api_key configured)
-    2. Gemini    — gemini-2.5-pro-preview   (if google_api_key configured)
+    1. Gemini    — gemini-2.5-pro           (if google_api_key configured)
+    2. Anthropic — claude-sonnet-4-6        (if anthropic_api_key configured)
+    3. OpenAI    — gpt-4o                   (if openai_api_key configured)
 
   LOW tasks (syllabus, repair, overview, glossary, analogy_extraction, topic_summary):
-    1. Anthropic — claude-haiku             (if anthropic_api_key configured)
-    2. Gemini    — gemini-2.0-flash         (if google_api_key configured)
+    1. Gemini    — gemini-2.5-flash         (if google_api_key configured)
+    2. Anthropic — claude-haiku             (if anthropic_api_key configured)
+    3. OpenAI    — gpt-4o-mini              (if openai_api_key configured)
 """
 
 from mastery_engine import logging_utils as log
 from mastery_engine.adapters.claude_adapter import ClaudeAdapter
 from mastery_engine.adapters.gemini_adapter import GeminiAdapter
+from mastery_engine.adapters.openai_adapter import OpenAIAdapter
 from mastery_engine.config import (
     GEMINI_HIGH, GEMINI_LOW,
     CLAUDE_HIGH, CLAUDE_LOW,
+    OPENAI_HIGH, OPENAI_LOW,
     HIGH_TASKS, LOW_TASKS,
+    FALLBACK_ORDER,
 )
 from mastery_engine.retry import FatalError, RetryableError, with_retry
 from mastery_engine.user_config import configured_providers
@@ -30,20 +36,25 @@ class LLMRouter:
         self._configured = configured_providers()
 
         self._adapters: dict[str, tuple] = {}
-        if "anthropic" in self._configured:
-            self._adapters["anthropic"] = (
-                ClaudeAdapter(model=CLAUDE_HIGH),
-                ClaudeAdapter(model=CLAUDE_LOW),
-            )
         if "gemini" in self._configured:
             self._adapters["gemini"] = (
                 GeminiAdapter(model=GEMINI_HIGH),
                 GeminiAdapter(model=GEMINI_LOW),
             )
+        if "anthropic" in self._configured:
+            self._adapters["anthropic"] = (
+                ClaudeAdapter(model=CLAUDE_HIGH),
+                ClaudeAdapter(model=CLAUDE_LOW),
+            )
+        if "openai" in self._configured:
+            self._adapters["openai"] = (
+                OpenAIAdapter(model=OPENAI_HIGH),
+                OpenAIAdapter(model=OPENAI_LOW),
+            )
 
-        # Anthropic first for all task tiers; Gemini as fallback
-        self._high_chain = [p for p in ["anthropic", "gemini"] if p in self._adapters]
-        self._low_chain  = [p for p in ["anthropic", "gemini"] if p in self._adapters]
+        # Primary provider first; fallbacks according to config
+        self._high_chain = [p for p in FALLBACK_ORDER if p in self._adapters]
+        self._low_chain  = [p for p in FALLBACK_ORDER if p in self._adapters]
 
     def call(self, task: str, prompt: str) -> str:
         """

@@ -4,8 +4,7 @@ from rich.console import Console
 from rich.table import Table
 
 from mastery_engine import logging_utils as log
-from mastery_engine.adapters.workspace_adapter import WorkspaceAdapter
-from mastery_engine.config import DEFAULT_MIN_TOPICS_PER_TIER, DEFAULT_MAX_TOPICS_PER_TIER
+from mastery_engine.config import DEFAULT_MIN_TOPICS_PER_TIER, DEFAULT_MAX_TOPICS_PER_TIER, CURRICULA_DIR
 from mastery_engine.llm_router import LLMRouter
 from mastery_engine.orchestrator import Orchestrator
 from mastery_engine.retry import FatalError
@@ -146,11 +145,10 @@ def _mask_or_none(key: str | None) -> str:
     "--max-topics-per-tier", default=DEFAULT_MAX_TOPICS_PER_TIER,
     show_default=True, help="Maximum topics per tier."
 )
-@click.option("--dry-run", is_flag=True, default=False, help="Preview syllabus and sample lesson without creating Workspace artifacts.")
+@click.option("--dry-run", is_flag=True, default=False, help="Preview syllabus and sample lesson without creating files.")
 def build(subject: str, resume: bool, run_id: str | None, max_topics_per_tier: int, dry_run: bool) -> None:
     """Build a microlearning curriculum for SUBJECT."""
     router = LLMRouter()
-    workspace = WorkspaceAdapter()
 
     chain = " -> ".join(p.capitalize() for p in router.provider_chain)
     log.info(f"Provider chain: {chain}")
@@ -164,7 +162,7 @@ def build(subject: str, resume: bool, run_id: str | None, max_topics_per_tier: i
 
     register_signal_handler(state)
 
-    orchestrator = Orchestrator(router, workspace, state, dry_run=dry_run)
+    orchestrator = Orchestrator(router, state, dry_run=dry_run)
 
     try:
         orchestrator.build()
@@ -213,17 +211,23 @@ def _resolve_resume(subject: str, run_id: str | None) -> RunState:
 
 @main.command()
 def doctor() -> None:
-    """Check all configured providers and Workspace CLI readiness."""
+    """Check all configured providers and local filesystem readiness."""
     router = LLMRouter()
-    workspace = WorkspaceAdapter()
 
     chain = " -> ".join(p.capitalize() for p in router.provider_chain)
     console.print(f"\n[bold]Provider chain:[/bold] {chain}\n")
 
     checks: list[tuple[bool, str]] = router.check()
 
-    ok_ws, msg_ws = workspace.check()
-    checks.append((ok_ws, f"gws CLI: {msg_ws}"))
+    # Local filesystem check
+    try:
+        CURRICULA_DIR.mkdir(parents=True, exist_ok=True)
+        test_file = CURRICULA_DIR / ".doctor_test"
+        test_file.write_text("test")
+        test_file.unlink()
+        checks.append((True, f"Curricula directory: {CURRICULA_DIR} (writable)"))
+    except Exception as e:
+        checks.append((False, f"Curricula directory: {CURRICULA_DIR} (error: {e})"))
 
     log.print_doctor_result(checks)
 
@@ -271,3 +275,7 @@ def status(run_id: str | None) -> None:
         for s in all_runs:
             console.print(f"  {s.run_id}  ({s.subject})  [{s.status.value}]  {s.updated_at[:16]}")
         console.print(f"\nUse [bold]mastery-engine status --run-id <id>[/bold] for details.")
+
+
+if __name__ == "__main__":
+    main()

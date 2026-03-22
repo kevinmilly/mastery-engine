@@ -42,18 +42,18 @@ def test_anthropic_added_when_key_configured(monkeypatch):
 def test_full_chain_order(monkeypatch):
     monkeypatch.setattr(
         "mastery_engine.llm_router.configured_providers",
-        lambda: ["gemini", "openai", "anthropic"]
+        lambda: ["gemini", "anthropic", "openai"]
     )
     from mastery_engine.llm_router import LLMRouter
     router = LLMRouter()
-    assert router.provider_chain == ["gemini", "openai", "anthropic"]
+    assert router.provider_chain == ["gemini", "anthropic", "openai"]
 
 
 # ── Task routing: HIGH vs LOW ──────────────────────────────────────────────────
 
 def _router_with_mock_adapters(monkeypatch, providers=None):
     if providers is None:
-        providers = ["gemini", "openai", "anthropic"]
+        providers = ["gemini", "anthropic", "openai"]
     monkeypatch.setattr("mastery_engine.llm_router.configured_providers", lambda: providers)
 
     gemini_high = _make_adapter("gemini-high-response")
@@ -67,8 +67,8 @@ def _router_with_mock_adapters(monkeypatch, providers=None):
     router = LLMRouter()
     router._adapters = {
         "gemini": (gemini_high, gemini_low),
-        "openai": (openai_high, openai_low),
         "anthropic": (claude_high, claude_low),
+        "openai": (openai_high, openai_low),
     }
     return router, {
         "gemini_high": gemini_high, "gemini_low": gemini_low,
@@ -95,33 +95,26 @@ def test_low_task_uses_low_adapter(monkeypatch):
 
 # ── Fallback logic ────────────────────────────────────────────────────────────
 
-def test_falls_back_to_openai_on_gemini_fatal(monkeypatch):
+def test_falls_back_to_anthropic_on_gemini_fatal(monkeypatch):
     router, adapters = _router_with_mock_adapters(monkeypatch)
     adapters["gemini_high"].call.side_effect = FatalError("auth failure")
     result = router.call("lesson", "prompt")
-    assert result == "openai-high-response"
+    assert result == "claude-high-response"
 
 
-def test_falls_back_to_openai_on_gemini_retryable_exhausted(monkeypatch):
-    router, adapters = _router_with_mock_adapters(monkeypatch)
-    adapters["gemini_high"].call.side_effect = RetryableError("quota exceeded")
-    result = router.call("lesson", "prompt")
-    assert result == "openai-high-response"
-
-
-def test_falls_back_to_anthropic_when_gemini_and_openai_fail(monkeypatch):
+def test_falls_back_to_openai_when_gemini_and_anthropic_fail(monkeypatch):
     router, adapters = _router_with_mock_adapters(monkeypatch)
     adapters["gemini_high"].call.side_effect = FatalError("auth")
-    adapters["openai_high"].call.side_effect = FatalError("auth")
+    adapters["claude_high"].call.side_effect = FatalError("auth")
     result = router.call("lesson", "prompt")
-    assert result == "claude-high-response"
+    assert result == "openai-high-response"
 
 
 def test_raises_fatal_when_all_providers_fail(monkeypatch):
     router, adapters = _router_with_mock_adapters(monkeypatch)
     adapters["gemini_high"].call.side_effect = FatalError("auth")
-    adapters["openai_high"].call.side_effect = FatalError("auth")
     adapters["claude_high"].call.side_effect = FatalError("auth")
+    adapters["openai_high"].call.side_effect = FatalError("auth")
     with pytest.raises(FatalError, match="All providers failed"):
         router.call("lesson", "prompt")
 
@@ -143,11 +136,11 @@ def test_unknown_task_raises_value_error(monkeypatch):
 
 # ── user_config ───────────────────────────────────────────────────────────────
 
-def test_configured_providers_gemini_only(monkeypatch):
+def test_configured_providers_none_configured(monkeypatch):
     monkeypatch.setattr("mastery_engine.user_config.get_key", lambda name: None)
     from mastery_engine.user_config import configured_providers
     providers = configured_providers()
-    assert providers == ["gemini"]
+    assert providers == []
 
 
 def test_configured_providers_with_openai(monkeypatch):
@@ -156,15 +149,14 @@ def test_configured_providers_with_openai(monkeypatch):
     monkeypatch.setattr("mastery_engine.user_config.get_key", mock_get_key)
     from mastery_engine.user_config import configured_providers
     providers = configured_providers()
-    assert "openai" in providers
-    assert "anthropic" not in providers
+    assert providers == ["openai"]
 
 
 def test_configured_providers_with_both(monkeypatch):
     monkeypatch.setattr("mastery_engine.user_config.get_key", lambda name: "key-value")
     from mastery_engine.user_config import configured_providers
     providers = configured_providers()
-    assert providers == ["gemini", "openai", "anthropic"]
+    assert providers == ["gemini", "anthropic", "openai"]
 
 
 def test_set_and_get_key(tmp_path, monkeypatch):

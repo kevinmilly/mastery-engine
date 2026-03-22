@@ -54,15 +54,15 @@ def clear_key(name: str) -> None:
 def configured_providers() -> list[str]:
     """
     Return which LLM providers have keys configured (env var or config file).
-    Anthropic is primary; Gemini (via Google API key) and OpenAI are fallbacks.
+    Gemini is primary; Anthropic and OpenAI are fallbacks.
     """
     providers = []
+    if get_key("google_api_key"):
+        providers.append("gemini")
     if get_key("anthropic_api_key"):
         providers.append("anthropic")
     if get_key("openai_api_key"):
         providers.append("openai")
-    if get_key("google_api_key"):
-        providers.append("gemini")
     return providers
 
 

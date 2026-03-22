@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from mastery_engine.config import STATE_DIR, TIERS
 from mastery_engine.models import (
-    Topic, TierState, RunStatus, RunConfig, DocRef, ContextCarry
+    Topic, TierState, RunStatus, RunConfig, FileRef, ContextCarry
 )
 
 
@@ -37,9 +37,9 @@ class RunState(BaseModel):
     created_at: str = ""
     updated_at: str = ""
     config: RunConfig
-    spreadsheet: DocRef = DocRef()
-    overview_doc: DocRef = DocRef()
-    glossary_doc: DocRef = DocRef()
+    run_dir: Optional[str] = None
+    overview_doc: FileRef = FileRef()
+    glossary_doc: FileRef = FileRef()
     topics: list[Topic] = []
     tiers: dict[str, TierState] = {}
     prompt_metadata: dict[str, str] = {}
