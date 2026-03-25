@@ -62,9 +62,10 @@ export function CurriculumCard({ curriculum }: CurriculumCardProps) {
             color: 'var(--color-text-primary)',
             margin: '0 0 0.5rem 0',
             lineHeight: 1.3,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
           }}
         >
           {curriculum.meta.title}

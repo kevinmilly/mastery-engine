@@ -157,16 +157,27 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
 
   return (
     <div
+      className="dashboard-grid"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 360px',
-        gap: '1.5rem',
-        padding: '1.5rem',
+        gridTemplateColumns: 'minmax(0, 1fr)',
+        gap: '1.25rem',
+        padding: '1rem',
         maxWidth: 1200,
         margin: '0 auto',
         alignItems: 'start',
       }}
     >
+      <style>{`
+        @media (min-width: 768px) {
+          .dashboard-grid { grid-template-columns: minmax(0, 1fr) 360px !important; padding: 1.5rem !important; }
+          .dashboard-sidebar { display: flex !important; }
+        }
+        .dashboard-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (min-width: 768px) {
+          .dashboard-sidebar { flex-direction: column !important; grid-template-columns: unset !important; }
+        }
+      `}</style>
       {/* Error banner — spans full width */}
       {error && (
         <div
@@ -231,7 +242,7 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
                 gap: '0.75rem',
               }}
             >
@@ -249,20 +260,14 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
         )}
       </div>
 
-      {/* Right column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Right column — 2-col grid on mobile, stacked on desktop */}
+      <div className="dashboard-sidebar">
         <StreakCard streak={streak} />
         <MomentumArc momentum={momentum} />
         <StudyHeatmap sessions={sessions} />
       </div>
 
-      {/* Responsive: stack on small screens */}
       <style>{`
-        @media (max-width: 768px) {
-          .dashboard-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
         @keyframes skeletonPulse {
           0%, 100% { opacity: 0.5; }
           50% { opacity: 1; }

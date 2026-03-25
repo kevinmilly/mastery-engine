@@ -122,8 +122,10 @@ export function parseCurriculumMeta(
 ): CurriculumMeta | null {
   if (!overviewContent || !indexContent) return null;
 
-  const title = extractH1(overviewContent);
-  if (!title) return null;
+  const rawTitle = extractH1(overviewContent);
+  if (!rawTitle) return null;
+  // Strip "Curriculum Overview: " prefix if present
+  const title = rawTitle.replace(/^curriculum\s+overview:\s*/i, '').trim();
 
   const tiers = parseIndexTable(indexContent);
   if (!tiers) return null;
