@@ -1,3 +1,6 @@
+import { Buffer } from 'buffer';
+(globalThis as typeof globalThis & { Buffer: typeof Buffer }).Buffer = Buffer;
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
