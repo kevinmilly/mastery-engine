@@ -97,7 +97,76 @@ class GitHubSource implements CurriculumSource {
       return;
     }
 
-    const treeData: { tree: GitHubTreeItem[] } = await treeRes.json();
+    const treeData: { tree: GitHubTreeItem[]; truncated?: boolean } = await treeRes.json();
+
+    const db = await getDb();
+
+    if (treeData.truncated) {
+      console.warn('Git tree truncated — falling back to per-folder fetch');
+      // Fallback: iterate each folder, fetch contents listing, then each file
+      const allMdPaths: Array<{ fullPath: string; relativePath: string }> = [];
+
+      for (const folder of _folderNames) {
+        try {
+          const folderRes = await fetch(
+            `${API_BASE}/contents/${CURRICULA_PATH}/${folder}`,
+            { headers: { Accept: 'application/vnd.github.v3+json' } }
+          );
+          if (!folderRes.ok) continue;
+          const folderItems: GitHubContentsItem[] = await folderRes.json();
+
+          for (const item of folderItems) {
+            if (item.type === 'dir') {
+              // Tier subdirectory — fetch its contents
+              const subRes = await fetch(
+                `${API_BASE}/contents/${item.path}`,
+                { headers: { Accept: 'application/vnd.github.v3+json' } }
+              );
+              if (!subRes.ok) continue;
+              const subItems: GitHubContentsItem[] = await subRes.json();
+              for (const sub of subItems) {
+                if (sub.type === 'file' && sub.name.endsWith('.md')) {
+                  const relativePath = sub.path.slice(`${CURRICULA_PATH}/`.length);
+                  allMdPaths.push({ fullPath: sub.path, relativePath });
+                }
+              }
+            } else if (item.type === 'file' && item.name.endsWith('.md')) {
+              const relativePath = item.path.slice(`${CURRICULA_PATH}/`.length);
+              allMdPaths.push({ fullPath: item.path, relativePath });
+            }
+          }
+        } catch {
+          // Non-fatal — skip this folder
+        }
+      }
+
+      const total = allMdPaths.length;
+      let fetched = 0;
+      onProgress?.(fetched, total);
+
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < allMdPaths.length; i += BATCH_SIZE) {
+        const batch = allMdPaths.slice(i, i + BATCH_SIZE);
+        await Promise.allSettled(
+          batch.map(async ({ fullPath, relativePath }) => {
+            try {
+              const res = await fetch(`${RAW_BASE}/${fullPath}`);
+              if (res.ok) {
+                const content = await res.text();
+                await db.put('file_cache', { path: relativePath, content, cachedAt: Date.now() });
+              }
+            } catch {
+              // Non-fatal
+            } finally {
+              fetched++;
+              onProgress?.(fetched, total);
+            }
+          })
+        );
+      }
+      return;
+    }
+
     const mdPaths = treeData.tree
       .filter(
         (item) =>
@@ -110,8 +179,6 @@ class GitHubSource implements CurriculumSource {
     const total = mdPaths.length;
     let fetched = 0;
     onProgress?.(fetched, total);
-
-    const db = await getDb();
 
     // Fetch in batches of 10 to avoid overwhelming the browser
     const BATCH_SIZE = 10;

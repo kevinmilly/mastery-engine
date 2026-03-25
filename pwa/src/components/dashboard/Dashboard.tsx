@@ -37,10 +37,12 @@ interface DashboardProps {
   onStartReading?: () => void;
   onStartDrills?: () => void;
   onOpenCapstone?: (ctx: CapstoneContext) => void;
+  error?: string | null;
 }
 
-export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOpenCapstone }: DashboardProps = {}) {
-  const { curricula, isLoading, isConnected, connect, error } = useCurriculumStore();
+export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOpenCapstone, error: errorProp }: DashboardProps = {}) {
+  const { curricula, isLoading, isConnected, connect, sync, error: storeError } = useCurriculumStore();
+  const error = errorProp ?? storeError;
   const { mode, setMode, setCurrentBlock, streak, momentum } = useSessionStore();
   const getAllDrillCards = useCurriculumStore((s) => s.getAllDrillCards);
   const getDueCardIds = useDrillStore((s) => s.getDueCardIds);
@@ -165,9 +167,52 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
         alignItems: 'start',
       }}
     >
+      {/* Error banner — spans full width */}
+      {error && (
+        <div
+          style={{
+            gridColumn: '1 / -1',
+            background: 'rgba(var(--color-accent-red-rgb, 220, 53, 69), 0.1)',
+            border: '1px solid var(--color-accent-red)',
+            borderRadius: 10,
+            padding: '1rem 1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+          }}
+        >
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: 'var(--color-accent-red)', margin: 0 }}>
+            Failed to load curricula: {error}
+          </p>
+          <button
+            onClick={isConnected ? sync : connect}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.85rem',
+              color: 'var(--color-accent-red)',
+              background: 'none',
+              border: '1px solid var(--color-accent-red)',
+              borderRadius: 6,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Left column */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <WhatNextCard block={nextBlock} onStart={handleStartReading} dueDrillsCount={dueCount} />
+
+        {isConnected && curricula.length === 0 && !error && (
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            No curricula found. Tap the sync icon to reload.
+          </p>
+        )}
 
         {curricula.length > 0 && (
           <div>

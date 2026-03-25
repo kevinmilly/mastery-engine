@@ -156,7 +156,7 @@ function AppContent() {
     pretestCards, pretestIndex, setPretestCards, advancePretest,
   } = useSessionStore();
 
-  const { curricula } = useCurriculumStore();
+  const { curricula, error: curriculumError } = useCurriculumStore();
   const { readingProgress } = useProgressStore();
   const nextBlock = useNextBlock();
 
@@ -318,6 +318,7 @@ function AppContent() {
               setCapstoneCtx(ctx);
               setMode('capstone');
             }}
+            error={curriculumError}
           />
         )}
       </motion.div>

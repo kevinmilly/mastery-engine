@@ -46,15 +46,15 @@ async function readWithCache(
   source: CurriculumSource,
   path: string
 ): Promise<string | null> {
+  // Check cache first
   const cached = await getCachedFile(path);
+  if (cached) return cached.content;
+
+  // Cache miss — fetch from network
   const fresh = await source.readFile(path);
-  if (fresh === null) return cached?.content ?? null;
+  if (fresh === null) return null;
 
-  const freshHash = source.getFileHash(fresh);
-  if (cached && source.getFileHash(cached.content) === freshHash) {
-    return cached.content;
-  }
-
+  // Store in cache for next time
   await cacheFile(path, fresh);
   return fresh;
 }
@@ -73,9 +73,12 @@ export async function loadCurriculum(
     readWithCache(source, `${folderName}/INDEX.md`),
   ]);
 
+  if (!overviewContent) console.warn(`Missing Overview.md for ${folderName}`);
+  if (!indexContent) console.warn(`Missing INDEX.md for ${folderName}`);
   if (!overviewContent || !indexContent) return null;
 
   const meta = parseCurriculumMeta(folderName, overviewContent, indexContent);
+  if (!meta) console.warn(`Failed to parse meta for ${folderName}`);
   if (!meta) return null;
 
   const readingBlocks: ReadingBlock[] = [];
@@ -136,19 +139,19 @@ export async function loadCurriculum(
 // ---------------------------------------------------------------------------
 
 export async function loadAllCurricula(
-  source: CurriculumSource
+  source: CurriculumSource,
+  folderNames?: string[]
 ): Promise<LoadedCurriculum[]> {
-  const folderNames = await source.listCurricula();
+  const names = folderNames ?? (await source.listCurricula());
   const results: LoadedCurriculum[] = [];
 
   await Promise.allSettled(
-    folderNames.map(async (name) => {
+    names.map(async (name) => {
       try {
         const loaded = await loadCurriculum(source, name);
         if (loaded) results.push(loaded);
       } catch (err) {
-        // Gracefully skip malformed or empty curricula
-        console.warn(`Skipping curriculum "${name}":`, err);
+        console.error(`Failed to load curriculum "${name}":`, err);
       }
     })
   );

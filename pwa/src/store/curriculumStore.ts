@@ -62,7 +62,7 @@ export const useCurriculumStore = create<CurriculumState>((set, get) => ({
         set({ syncProgress: null });
       }
 
-      const curricula = await loadAllCurricula(gitHubSource);
+      const curricula = await loadAllCurricula(gitHubSource, folderNames);
       set({
         curricula,
         isConnected: true,
@@ -102,7 +102,7 @@ export const useCurriculumStore = create<CurriculumState>((set, get) => ({
       });
       set({ syncProgress: null });
 
-      const curricula = await loadAllCurricula(gitHubSource);
+      const curricula = await loadAllCurricula(gitHubSource, folderNames);
       set({
         curricula,
         isConnected: true,
