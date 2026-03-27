@@ -37,13 +37,14 @@ interface DashboardProps {
   onStartReading?: () => void;
   onStartDrills?: () => void;
   onOpenCapstone?: (ctx: CapstoneContext) => void;
+  onCurriculumClick?: (curriculumId: string) => void;
   error?: string | null;
 }
 
-export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOpenCapstone, error: errorProp }: DashboardProps = {}) {
+export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOpenCapstone, onCurriculumClick, error: errorProp }: DashboardProps = {}) {
   const { curricula, isLoading, isConnected, connect, sync, error: storeError } = useCurriculumStore();
   const error = errorProp ?? storeError;
-  const { mode, setMode, setCurrentBlock, streak, momentum } = useSessionStore();
+  const { mode, setMode, setCurrentBlock, streak, momentum, readingCurriculumId, setReadingCurriculumId } = useSessionStore();
   const getAllDrillCards = useCurriculumStore((s) => s.getAllDrillCards);
   const getDueCardIds = useDrillStore((s) => s.getDueCardIds);
   const nextBlock = useNextBlock();
@@ -217,7 +218,17 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
 
       {/* Left column */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        <WhatNextCard block={nextBlock} onStart={handleStartReading} dueDrillsCount={dueCount} />
+        <WhatNextCard
+          block={nextBlock}
+          onStart={handleStartReading}
+          dueDrillsCount={dueCount}
+          focusCurriculumTitle={
+            readingCurriculumId
+              ? (curricula.find((c) => c.meta.id === readingCurriculumId)?.meta.title ?? null)
+              : null
+          }
+          onClearFocus={() => setReadingCurriculumId(null)}
+        />
 
         {isConnected && curricula.length === 0 && !error && (
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
@@ -247,7 +258,11 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
               }}
             >
               {curricula.map((c) => (
-                <CurriculumCard key={c.meta.id} curriculum={c} />
+                <CurriculumCard
+                  key={c.meta.id}
+                  curriculum={c}
+                  onClick={onCurriculumClick ? () => onCurriculumClick(c.meta.id) : undefined}
+                />
               ))}
             </div>
           </div>

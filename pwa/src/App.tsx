@@ -5,6 +5,7 @@ import { useCurriculumStore } from '@/store/curriculumStore';
 import { useProgressStore } from '@/store/progressStore';
 import { useNextBlock } from '@/hooks/useNextBlock';
 import { Dashboard } from '@/components/dashboard/Dashboard';
+import { CurriculumDetailView } from '@/components/dashboard/CurriculumDetailView';
 import { ReaderView } from '@/components/reader/ReaderView';
 import { DrillSession } from '@/components/drill/DrillSession';
 import { FocusModeSelector } from '@/components/drill/FocusModeSelector';
@@ -17,6 +18,7 @@ const MODE_LABELS: Record<string, string> = {
   drill: 'Drilling',
   pretest: 'Pre-Test',
   capstone: 'Capstone',
+  'curriculum-detail': 'Subject',
 };
 
 // ArrowsClockwise icon (Phosphor-style, inline SVG)
@@ -154,6 +156,8 @@ function AppContent() {
     mode, setMode,
     currentBlock, setCurrentBlock,
     pretestCards, pretestIndex, setPretestCards, advancePretest,
+    setReadingCurriculumId,
+    detailCurriculumId, setDetailCurriculumId,
   } = useSessionStore();
 
   const { curricula, error: curriculumError } = useCurriculumStore();
@@ -216,6 +220,24 @@ function AppContent() {
   }
 
   function handleReaderBack() {
+    setMode('dashboard');
+  }
+
+  // -----------------------------------------------------------------------
+  // Curriculum detail + reading mode
+  // -----------------------------------------------------------------------
+  function handleCurriculumClick(curriculumId: string) {
+    setDetailCurriculumId(curriculumId);
+    setMode('curriculum-detail');
+  }
+
+  function handleCurriculumSequential() {
+    setReadingCurriculumId(detailCurriculumId);
+    setMode('dashboard');
+  }
+
+  function handleCurriculumInterleaved() {
+    setReadingCurriculumId(null);
     setMode('dashboard');
   }
 
@@ -302,11 +324,26 @@ function AppContent() {
           />
         )}
 
+        {/* Curriculum Detail */}
+        {mode === 'curriculum-detail' && detailCurriculumId && (() => {
+          const curriculum = curricula.find((c) => c.meta.id === detailCurriculumId);
+          if (!curriculum) return null;
+          return (
+            <CurriculumDetailView
+              curriculum={curriculum}
+              onSequential={handleCurriculumSequential}
+              onInterleaved={handleCurriculumInterleaved}
+              onBack={() => setMode('dashboard')}
+            />
+          );
+        })()}
+
         {/* Dashboard (default) */}
         {(mode === 'dashboard' ||
           (mode === 'reader' && !currentBlock) ||
           (mode === 'pretest' && pretestCards.length === 0) ||
-          (mode === 'capstone' && !capstoneCtx)) && (
+          (mode === 'capstone' && !capstoneCtx) ||
+          (mode === 'curriculum-detail' && !detailCurriculumId)) && (
           <Dashboard
             onStartReading={handleStartReading}
             onStartDrills={() => {
@@ -318,6 +355,7 @@ function AppContent() {
               setCapstoneCtx(ctx);
               setMode('capstone');
             }}
+            onCurriculumClick={handleCurriculumClick}
             error={curriculumError}
           />
         )}

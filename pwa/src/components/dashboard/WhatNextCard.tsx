@@ -7,6 +7,8 @@ interface WhatNextCardProps {
   block: ReadingBlock | null;
   onStart: () => void;
   dueDrillsCount?: number;
+  focusCurriculumTitle?: string | null;
+  onClearFocus?: () => void;
 }
 
 function estimatedReadLabel(minutes: number): string {
@@ -20,7 +22,7 @@ const TIER_VARIANT: Record<string, 'sage' | 'amber' | 'red'> = {
   Mastery: 'red',
 };
 
-export function WhatNextCard({ block, onStart, dueDrillsCount = 0 }: WhatNextCardProps) {
+export function WhatNextCard({ block, onStart, dueDrillsCount = 0, focusCurriculumTitle, onClearFocus }: WhatNextCardProps) {
   if (!block) {
     return (
       <div
@@ -69,6 +71,56 @@ export function WhatNextCard({ block, onStart, dueDrillsCount = 0 }: WhatNextCar
         gap: '1rem',
       }}
     >
+      {focusCurriculumTitle && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '6px 10px',
+            borderRadius: 8,
+            background: 'rgba(122,155,138,0.1)',
+            border: '1px solid rgba(122,155,138,0.3)',
+            alignSelf: 'flex-start',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.72rem',
+              color: 'var(--color-accent-sage)',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
+            Sequential: {focusCurriculumTitle}
+          </span>
+          {onClearFocus && (
+            <button
+              onClick={onClearFocus}
+              title="Switch to all subjects"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: 'rgba(122,155,138,0.2)',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--color-accent-sage)',
+                padding: 0,
+                lineHeight: 1,
+                fontSize: '0.7rem',
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <Badge variant={tierVariant}>{block.tier}</Badge>
         <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { Rating } from '@/engine/fsrsEngine';
 import type { ReadingBlock, DrillCard } from '@/types';
 
-export type AppMode = 'dashboard' | 'reader' | 'drill' | 'pretest' | 'capstone';
+export type AppMode = 'dashboard' | 'reader' | 'drill' | 'pretest' | 'capstone' | 'curriculum-detail';
 
 // ---------------------------------------------------------------------------
 // localStorage helpers
@@ -50,6 +50,14 @@ interface SessionState {
   currentBlock: ReadingBlock | null;
   setCurrentBlock: (block: ReadingBlock | null) => void;
 
+  // Focused curriculum reading (null = auto/all curricula)
+  readingCurriculumId: string | null;
+  setReadingCurriculumId: (id: string | null) => void;
+
+  // Curriculum detail view
+  detailCurriculumId: string | null;
+  setDetailCurriculumId: (id: string | null) => void;
+
   // Current drill context
   currentDrillQueue: DrillCard[];
   currentDrillIndex: number;
@@ -83,6 +91,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   currentBlock: null,
   setCurrentBlock: (block) => set({ currentBlock: block }),
+
+  readingCurriculumId: null,
+  setReadingCurriculumId: (id) => set({ readingCurriculumId: id }),
+
+  detailCurriculumId: null,
+  setDetailCurriculumId: (id) => set({ detailCurriculumId: id }),
 
   currentDrillQueue: [],
   currentDrillIndex: 0,

@@ -5,6 +5,7 @@ import { useProgressStore } from '@/store';
 
 interface CurriculumCardProps {
   curriculum: LoadedCurriculum;
+  onClick?: () => void;
 }
 
 const TIER_ORDER = ['Foundations', 'Mechanics', 'Mastery'] as const;
@@ -15,7 +16,7 @@ const TIER_VARIANT: Record<string, TierVariant> = {
   Mastery: 'red',
 };
 
-export function CurriculumCard({ curriculum }: CurriculumCardProps) {
+export function CurriculumCard({ curriculum, onClick }: CurriculumCardProps) {
   const getCompletedCountForCurriculum = useProgressStore((s) => s.getCompletedCountForCurriculum);
   const getTotalCountForCurriculum = useProgressStore((s) => s.getTotalCountForCurriculum);
   const getCompletedCountForTier = useProgressStore((s) => s.getCompletedCountForTier);
@@ -28,6 +29,10 @@ export function CurriculumCard({ curriculum }: CurriculumCardProps) {
 
   return (
     <div
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
       style={{
         background: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
@@ -36,14 +41,16 @@ export function CurriculumCard({ curriculum }: CurriculumCardProps) {
         display: 'flex',
         gap: '1rem',
         alignItems: 'flex-start',
-        cursor: 'default',
-        transition: 'background 200ms',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'background 200ms, border-color 200ms',
       }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLDivElement).style.background = 'var(--color-surface-raised)';
+        if (onClick) (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-accent-sage)';
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLDivElement).style.background = 'var(--color-surface)';
+        (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-border)';
       }}
     >
       <CircularProgress
