@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useCurriculumStore } from '@/store/curriculumStore';
 import { useSessionStore } from '@/store/sessionStore';
-import { useDrillStore } from '@/store/drillStore';
 import { useNextBlock } from '@/hooks/useNextBlock';
+import { useDueDrills } from '@/hooks/useDueDrills';
 import { getDb } from '@/lib/db';
 import type { SessionLog } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -45,9 +45,8 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
   const { curricula, isLoading, isConnected, connect, sync, error: storeError } = useCurriculumStore();
   const error = errorProp ?? storeError;
   const { mode, setMode, setCurrentBlock, streak, momentum, readingCurriculumId, setReadingCurriculumId } = useSessionStore();
-  const getAllDrillCards = useCurriculumStore((s) => s.getAllDrillCards);
-  const getDueCardIds = useDrillStore((s) => s.getDueCardIds);
   const nextBlock = useNextBlock();
+  const dueDrills = useDueDrills();
   const [sessions, setSessions] = useState<SessionLog[]>([]);
 
   // Load sessions from IDB for heatmap
@@ -63,8 +62,7 @@ export function Dashboard({ onStartReading, onStartDrills, onOpenCapstone: _onOp
     })();
   }, [mode]);
 
-  const allDrillIds = getAllDrillCards().map((c) => c.id);
-  const dueCount = getDueCardIds(allDrillIds).length;
+  const dueCount = dueDrills.length;
 
   if (!isConnected && !isLoading) {
     return (

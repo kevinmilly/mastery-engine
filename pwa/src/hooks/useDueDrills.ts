@@ -1,5 +1,6 @@
 import { useCurriculumStore } from '@/store/curriculumStore';
 import { useDrillStore } from '@/store/drillStore';
+import { useProgressStore } from '@/store/progressStore';
 import type { DrillCard } from '@/types';
 
 /**
@@ -42,9 +43,22 @@ function interleave(cards: DrillCard[]): DrillCard[] {
 
 export function useDueDrills(focusTopics?: string[]): DrillCard[] {
   const getAllDrillCards = useCurriculumStore((s) => s.getAllDrillCards);
+  const getAllReadingBlocks = useCurriculumStore((s) => s.getAllReadingBlocks);
   const getDueCardIds = useDrillStore((s) => s.getDueCardIds);
+  const readingProgress = useProgressStore((s) => s.readingProgress);
 
-  let allCards = getAllDrillCards();
+  // Build set of topic keys where reading has been started
+  const startedTopics = new Set<string>();
+  for (const block of getAllReadingBlocks()) {
+    const prog = readingProgress.get(block.id);
+    if (prog?.status === 'in-progress' || prog?.status === 'completed') {
+      startedTopics.add(`${block.curriculumId}::${block.topicId}`);
+    }
+  }
+
+  let allCards = getAllDrillCards().filter((c) =>
+    startedTopics.has(`${c.curriculumId}::${c.topicId}`)
+  );
 
   // Filter by focusTopics if provided
   if (focusTopics && focusTopics.length > 0) {
