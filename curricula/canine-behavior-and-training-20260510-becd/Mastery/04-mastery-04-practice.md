@@ -1,0 +1,41 @@
+## Exercises
+
+**Exercise 1**
+A dog growls when its owner approaches while it chews a rawhide, but immediately stops chewing and moves away when the owner reaches down. A neighbor insists the dog is "dominant" and needs to be corrected for growling. Why is suppressing the growl through punishment a dangerous intervention, and what does the dog's behavior actually communicate?
+
+**Exercise 2**
+You are assessing a dog for resource guarding severity. The dog stiffens and freezes over its food bowl when you approach at 10 feet, but shows no other signals. As you continue to 5 feet, it lifts its lip. At 2 feet, it snaps without contact. Map this dog's warning sequence and explain what this pattern tells you about the dog's threshold and the risk level of the case.
+
+**Exercise 3**
+A rescue organization asks you to evaluate two dogs. Dog A guards food bowls only in the presence of other dogs and shows a full warning sequence (freeze → growl → snap) before escalating. Dog B guards any object a human picks up, escalates from stillness directly to a bite with no intermediate signals, and has a bite history. Compare the risk profiles of these two dogs and explain which factors drive your assessment.
+
+**Exercise 4**
+A trainer proposes using a "trade-up" protocol: whenever the dog has a valued item, approach and offer a high-value treat, let the dog take the treat, then return the original item. A client questions whether this will "teach the dog that guarding works." Evaluate this concern — is it valid? What behavioral mechanism does the trade-up protocol actually leverage, and under what conditions could the concern become partially true?
+
+**Exercise 5**
+A dog has completed a resource guarding modification program and reliably accepts human approach during meals at home. The owners report that last week, at a family gathering, the dog bit a child who reached for the dog's chew. Using your knowledge of behavior chains, stimulus generalization, and the principles of maintaining behavior under varied conditions, explain why this breakdown occurred and what the modification program likely failed to address.
+
+**Exercise 6**
+You are working with a dog that shows moderate food-bowl guarding (growls at 3-foot approach, no bite history) and also has leash reactivity toward unfamiliar dogs. The owners have limited training time and want to address both issues simultaneously. Design a prioritization and sequencing rationale — not a full protocol — that integrates what you know about emotional arousal, reinforcement history, and safe management. Justify your choices.
+
+---
+
+## Answer Key
+
+**Answer 1**
+Suppressing the growl through punishment removes the dog's warning signal without changing the underlying emotional state — the dog still feels threatened by the approach but has learned that growling results in punishment. The likely outcome is a dog that skips growling and bites without warning, which is objectively more dangerous. The growl is communication, not defiance. The dog's behavior (freezing, moving away) actually shows it is conflict-avoidant and offering appeasement; the "dominance" framing misreads a fearful or anxious dog as an aggressive challenger. The appropriate response is to treat the growl as information about the dog's threshold and redesign the situation to stay below that threshold while working on counter-conditioning.
+
+**Answer 2**
+The dog's warning sequence is: freeze/stiffen (10 ft) → lip lift (5 ft) → snap (2 ft). This is a relatively compressed sequence — the dog offers warnings but they escalate quickly across a short distance range, leaving little room for human response. The threshold for initial arousal is high (10 ft), which is useful, but the escalation between signals is rapid and the dog reached a snap without contact, indicating it is not yet a bite-inhibited case but is close to that line. Risk level is moderate-to-high: the dog does communicate before snapping, which is a protective factor, but the short distance between lip lift and snap means an inattentive or fast-moving person could easily skip the intermediate signals and trigger a bite.
+
+**Answer 3**
+Dog A presents a lower risk profile. Context-specificity (only with other dogs) suggests the guarding is driven by inter-dog competition rather than generalized human threat, making management more straightforward. Critically, Dog A shows a complete warning ladder, which means there is time to intervene and the dog is not suppressing signals. Dog B is significantly higher risk for several reasons: the trigger set is broad (any object a human handles), the warning sequence is collapsed (direct escalation to bite), and there is a bite history, meaning the dog has learned that biting is effective. The collapsed warning sequence is the most dangerous single factor — it eliminates the safety margin that warnings provide and suggests prior warning signals may have been punished or ignored.
+
+**Answer 4**
+The concern is not valid in a well-implemented protocol. The trade-up procedure leverages classical counter-conditioning (approach predicts a good thing happening) combined with operant reinforcement of relaxed, non-guarding behavior. Crucially, the item is returned — so the dog is not actually losing the resource, which means guarding is not "rewarded" by keeping the item. Over many repetitions, human approach becomes a cue predicting good outcomes rather than a threat predicting loss. The concern could become partially valid in one scenario: if treats are only offered when the dog is already guarding (stiffening, growling), and the treats are delivered while the dog is in that aroused state, the protocol could inadvertently reinforce the guarding posture rather than a relaxed baseline. Proper implementation requires delivering the treat before the dog escalates and building a history of approach = good outcome from the ground up.
+
+**Answer 5**
+The breakdown reveals two gaps. First, the modification program likely trained in a low-distraction, controlled environment without proofing the behavior across varied contexts — a failure of stimulus generalization. The dog learned "this human approaching this bowl in this room is safe," not "humans approaching food is safe." A child at a family gathering represents multiple novel variables: unfamiliar person, unpredictable movement, high ambient arousal. Second, from a behavior chain perspective, the guarding behavior chain (tense → warn → bite) was never fully extinguished; it was suppressed in a narrow context. Under novel, high-arousal conditions, the original chain re-emerged. Effective maintenance requires systematic generalization training across people, locations, and distraction levels — essentially re-running the protocol in progressively more challenging environments before declaring the behavior modified.
+
+**Answer 6**
+Prioritization rationale: address resource guarding first, before leash reactivity, for two reasons. First, resource guarding poses a direct bite risk in the home environment and occurs during predictable, containable moments (meals, chew time) — management is immediately achievable by controlling access and feeding locations. Leash reactivity, while disruptive, is less likely to result in a bite to a family member. Second, both issues likely share an underlying emotional component — elevated arousal and a low threshold for perceived threat. Beginning with resource guarding counter-conditioning builds the dog's history of "approach = good things" and may reduce global arousal reactivity, creating a better emotional baseline before tackling leash work. Sequencing recommendation: implement immediate management for guarding (no free access to high-value items around children, controlled feeding zones), begin counter-conditioning protocol for guarding, and use management-only for leash reactivity (controlled routes, distance from triggers) until guarding work shows measurable threshold improvement. Do not run active modification protocols for both simultaneously — splitting limited training time and introducing arousal from leash work could undermine the calm-baseline required for guarding desensitization.

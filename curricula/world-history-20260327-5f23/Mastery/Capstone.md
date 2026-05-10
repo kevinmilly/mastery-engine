@@ -1,0 +1,29 @@
+## Capstone: Mastery — World History
+
+### The Scenario
+You are a senior historical consultant hired by the "National Commission for Historical Reconciliation and Commemoration" in the fictional Republic of San Cordia. San Cordia is a mid-sized nation that gained independence in 1964 after 300 years of rule by the European "Aethelian Empire." Your expertise is needed to resolve a contentious national issue.
+
+The heart of the dispute is the main square in the capital, Puerto Cobre. The square is dominated by a grand equestrian statue of Governor-General Marius Varrus, the Aethelian official who, in 1888, brutally suppressed the "Ten Valleys Rebellion," a large-scale indigenous uprising. This event, which Aethelian histories call the "Great Pacification," is seen by many Cordians as a foundational trauma, while for others it represents the imposition of order that led to the nation's modern infrastructure. The statue was erected by the colonial government in 1910.
+
+The Commission is deadlocked. Faction A, representing indigenous and activist groups, demands the statue be torn down and replaced with a memorial to the Rebellion's leaders. Faction B, composed of business leaders and established political figures, argues for keeping Varrus as a complex historical figure and erecting a new, separate monument to the "Founders of Independence" from the 1960s. Faction C, a minority group of artists and public intellectuals, proposes removing all figurative statues and creating an abstract monument to "Unity and Forward Progress," thereby avoiding a "divisive" focus on the past.
+
+The Commission has tasked you with producing a portfolio of historical analyses to provide them with the necessary depth and clarity to make a final, binding recommendation to the government. They are not looking for a simple opinion; they need a rigorous, multi-faceted historical framework for their decision.
+
+### Your Tasks
+Your final deliverable will be a portfolio containing four analytical memos and one final recommendation.
+
+1.  **Memo 1: Historical Context Brief.** Analyze the long-term consequences of Aethelian colonial rule and the "Great Pacification" on San Cordia's contemporary society. Your analysis must connect specific colonial policies (e.g., land distribution, labor systems, educational policies) to enduring social, economic, and political inequalities that fuel the current monument controversy.
+
+2.  **Memo 2: Historiographical and Stakeholder Analysis.** Identify and explain the major competing historical interpretations (historiography) of the late 19th century in San Cordia (e.g., the imperial narrative, the nationalist narrative, post-colonial critiques, indigenous oral traditions). Map these distinct historical narratives onto the stated positions of Factions A, B, and C, explaining how each group's proposal is underpinned by a particular interpretation of the past.
+
+3.  **Memo 3: Analysis of Causation and Agency.** Frame the "Ten Valleys Rebellion" and its suppression through the lens of historical determinism versus contingency. In your analysis, address the following: How does viewing the event as an "inevitable" outcome of imperial forces differ from viewing it as a "contingent" event shaped by specific decisions of individuals like Varrus and the rebellion's leaders? Explain how each of these causal frameworks carries different ethical implications for judging the historical actors and commemorating the event.
+
+4.  **Memo 4: Comparative Case Studies.** Research and present two concise case studies of how other post-colonial nations have handled controversial colonial-era monuments. For each case, describe the historical context of the monument, the options considered, the action taken (e.g., removal, re-contextualization, destruction), and the subsequent public and political reaction. These cases should provide the Commission with a broader international context for their own decision.
+
+5.  **Final Recommendation.** Synthesize your findings from the previous four tasks into a formal, persuasive recommendation to the Commission. You are not required to endorse one of the existing three factional proposals. Your recommendation must propose a specific, actionable course of action for the Varrus statue and the square. Crucially, you must justify your proposal using the evidence and reasoning developed in your analyses of colonial legacies, historiography, causation, and comparative precedents.
+
+### What Good Work Looks Like
+*   **Nuanced Historical Argumentation:** A strong response will move beyond a simple "colonizers bad, rebels good" narrative. It will engage with the complexities, contradictions, and multiple perspectives inherent in the historical record, demonstrating an understanding that historical figures and events are rarely monolithic.
+*   **Explicit Integration of Concepts:** The work will not just address the tasks in isolation but will weave together the concepts of colonial legacy, historiography, contingency, and commemoration into a coherent and reinforcing analytical framework. For example, the final recommendation will be clearly and explicitly built upon the foundations laid in the preceding memos.
+*   **Evidence-Based Justification:** The analysis and final recommendation will be driven by sound historical reasoning, not personal opinion. Claims will be well-supported, and the logic connecting the historical analysis to the final commemorative proposal will be clear, compelling, and defensible.
+*   **Awareness of Real-World Stakes:** A sophisticated response will show an appreciation for the fact that historical commemoration is not a purely academic exercise. It will acknowledge the real social and political weight of the Commission's decision and frame its recommendation with a sensitivity to the goal of "reconciliation."

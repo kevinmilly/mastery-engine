@@ -1,0 +1,41 @@
+## Exercises
+
+**Exercise 1**
+A dog is standing with its weight shifted forward onto its front legs, ears pinned forward, tail held high and stiff, and its mouth closed with lips slightly pulled forward. A stranger is approaching. Identify what this cluster of signals most likely communicates and explain why reading the signals together matters more than reading any single signal alone.
+
+**Exercise 2**
+You are watching two dogs interact at a dog park. Dog A suddenly freezes completely still, holds its breath, and fixes its gaze directly on Dog B. Dog B continues sniffing the ground nearby. Which dog is displaying a higher-stress or higher-risk signal at this moment, and what should a handler watching this scene be prepared to do next?
+
+**Exercise 3**
+A dog at a veterinary clinic shows the following: ears flattened sideways ("airplane ears"), tail tucked between the hind legs, body lowered close to the ground, yawning repeatedly, and licking its lips when no food is present. The owner says, "She's fine — she's always like this here, but she's never bitten anyone." Evaluate the owner's reasoning. What does the dog's body language actually indicate, and what is the risk in dismissing these signals?
+
+**Exercise 4**
+Two dogs greet each other. Dog A approaches in a curved arc rather than head-on, has a loose wiggly body, and its tail is wagging in wide, low sweeps. Dog B's tail is also wagging, but it is held high and moving in short, rapid, stiff strokes. Explain why both dogs are wagging their tails yet the interaction may still carry risk, and what the handler of Dog B should watch for next.
+
+**Exercise 5**
+A trainer is working with a rescue dog on a basic "sit" cue using food rewards. The dog is performing the behavior correctly but is also showing whale eye (visible whites of the eyes), a furrowed brow, and is taking treats very hard and fast. The trainer interprets this as the dog "being enthusiastic about training." Drawing on your understanding of stress indicators and the dog's sensory world, challenge this interpretation and explain what a more accurate assessment would look like — and what adjustments to the training session you would recommend.
+
+**Exercise 6**
+A family adopts a dog and reports that during the first week he was "perfect — calm, quiet, and relaxed." By week three, the dog growled at a child who reached over his head to pet him, which shocked the family. They say there were "no warning signs." Using your knowledge of canine communication signals, the stress response, and what you know about how dogs read and respond to human interaction, construct an explanation for why the growl was likely not the first warning sign — and what signals the family most probably missed or misinterpreted in the preceding weeks.
+
+---
+
+## Answer Key
+
+**Answer 1**
+The cluster of signals — weight forward, ears pricked forward, high stiff tail, closed mouth with lips pulled forward — indicates a dog that is alert, aroused, and potentially moving toward offensive threat display rather than fear. Each signal alone is ambiguous: forward ears could indicate curiosity, a high tail could be confidence, and a closed mouth could be neutral. But taken together, they form a coherent picture of a dog that is directing intense attention toward the stranger and is physically prepared to escalate. Reading clusters matters because individual signals can appear in many emotional states; it is the combination and context that reveal the dog's actual internal state and trajectory.
+
+**Answer 2**
+Dog A is displaying the higher-risk signal. A hard freeze with a fixed, unblinking stare is a predatory or threat-related behavior — it is the body suppressing all movement before a potential lunge or snap. This is distinct from normal stillness. Dog B's ground-sniffing may actually be a displacement or appeasement behavior, suggesting it senses tension and is trying to avoid conflict. A handler watching this scene should immediately and calmly intervene — calling their dog away or stepping between the dogs — before the freeze resolves into an escalation. Waiting for a growl or snap would mean waiting too long.
+
+**Answer 3**
+The owner's reasoning is flawed because absence of biting in the past does not mean the dog is not stressed now, and it does not predict future behavior. The dog's signals — flattened ears, tucked tail, lowered body, yawning, and lip-licking without food — are textbook indicators of fear and stress in a clinical environment. Yawning and lip-licking in this context are displacement behaviors and calming signals, not signs of relaxation. The risk in dismissing these signals is twofold: the dog is experiencing genuine distress that may be affecting its welfare, and a dog that is consistently pushed past its stress threshold without relief is more likely to escalate to defensive aggression when it feels it has run out of other options. The dog has been communicating discomfort; the owner has not been trained to read it.
+
+**Answer 4**
+Tail wagging is not a uniform signal of friendliness — it indicates arousal and emotional engagement, which can be positive or negative. Dog A's wide, low, loose wag paired with a curved approach and wiggly body indicates relaxed, friendly intent. Dog B's high, stiff, rapid tail wag is a sign of high arousal and tension — the tail position (high) signals confidence or dominance, and the stiffness signals that the dog is not relaxed. The handler of Dog B should watch for escalating body tension, a shift of weight forward, a hard stare, or stillness — any of which would indicate that Dog B's arousal is tipping toward aggression rather than play. This is a situation where visual scanning of the whole body, not just the tail, is essential.
+
+**Answer 5**
+The trainer's interpretation is inaccurate. Whale eye, a furrowed brow, and hard, fast treat-taking are stress indicators, not enthusiasm markers. Hard treat-taking in particular is often misread as eagerness but is actually associated with high arousal and anxiety — the dog is grabbing quickly because it is in a state of stress, not because it is especially motivated by the food. From a sensory standpoint, a stressed dog may have heightened reactivity, making food delivery itself feel more urgent and intense. The correct assessment is that the dog is performing the behavior while operating under stress — possibly because the training environment, proximity, or pace is overwhelming. Recommended adjustments: increase distance from any stressors, slow the pace of the session, use lower-value treats delivered more gently, shorten the session, and incorporate more sniffing or exploratory breaks to lower the dog's overall arousal before resuming. Compliance during training is not the same as comfort.
+
+**Answer 6**
+The growl was almost certainly the last warning, not the first. Dogs follow a well-documented escalation sequence before reaching a growl or bite, and earlier signals are frequently missed by people unfamiliar with canine body language. In the first week, the dog was likely in a suppressed behavioral state — sometimes called the "honeymoon" or "shutdown" phase — where a new dog in an unfamiliar environment shuts down and appears calm because it is overwhelmed and orienting. This can look like perfect behavior but is actually a form of stress-related inhibition. In the weeks that followed, as the dog became more comfortable and behaviorally active, it may have been offering earlier signals — lip licking, looking away, moving away from the child, stiffening when touched — that the family interpreted as neutral or ignored. The specific trigger (a hand reaching over the head) is a well-established aversive for dogs; from a communication standpoint, this is a looming, top-down approach that reads as threatening, particularly from a less familiar or unpredictable individual like a child. The dog communicated discomfort through subtler means, those were not acted upon, and the growl was its clearest available signal before escalation. The family's surprise reflects a gap in reading early-stage body language, not an absence of signals.

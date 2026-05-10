@@ -1,0 +1,41 @@
+## Exercises
+
+**Exercise 1**
+A dog has learned that jumping on visitors causes them to give attention (even if the attention is "No! Down!"). You decide to implement extinction. Describe exactly what you would instruct the visitors to do, and explain why that specific action (or inaction) constitutes extinction rather than punishment.
+
+**Exercise 2**
+During the first week of an extinction protocol for a dog who barks at the back door to be let outside, the owner reports that the barking has gotten dramatically louder and more persistent before it starts to decrease. The owner is worried the training is failing. Is this evidence the protocol is working or failing? Explain what is happening and what the owner should do.
+
+**Exercise 3**
+A shelter dog repeatedly paws at a kennel latch. Staff have been unknowingly reinforcing this by walking over to check on the dog every time it does so. A new protocol is introduced: staff will no longer approach when the dog paws the latch. Two days in, the dog begins body-slamming the door instead. Analyze what is happening behaviorally and explain whether extinction is still the right tool here, or whether a different approach is needed.
+
+**Exercise 4**
+A trainer is working with a dog that steals socks and runs around the house with them. The owner has been chasing the dog, which the dog finds exciting. The trainer recommends extinction. A colleague argues this is risky because "self-rewarding behaviors can't be extinguished." Evaluate this claim. Under what conditions is the colleague right, and under what conditions is the trainer's approach sound?
+
+**Exercise 5**
+You are designing a behavior modification plan for a dog that whines and paws at its owner during meals. The behavior has been intermittently reinforced — sometimes the owner gives in, sometimes not. Using your understanding of both operant conditioning schedules and extinction, predict how the dog's behavior will respond to extinction and explain how the history of intermittent reinforcement affects your timeline and management strategy.
+
+**Exercise 6**
+A client wants to extinguish their dog's demand barking at the park when other dogs are present. They begin ignoring the barking completely. After two weeks, the barking decreases at home but not at the park. Using your knowledge of classical conditioning, operant conditioning, and extinction, diagnose why the behavior persists in one context but not the other, and design a revised protocol that addresses the root cause.
+
+---
+
+## Answer Key
+
+**Answer 1**
+Extinction means removing the reinforcer that maintains the behavior — in this case, any form of attention. Visitors should turn their back, cross their arms, make no eye contact, and say nothing when the dog jumps. They should not say "off," push the dog down, or make any physical or verbal contact, because all of those responses still deliver attention (a social stimulus), which is the reinforcer. This is categorically different from punishment: punishment adds an aversive consequence to reduce behavior; extinction simply withholds the payoff. If visitors apply mild punishment inconsistently, they may accidentally create an intermittent reinforcement schedule that makes the jumping more resistant to change.
+
+**Answer 2**
+This is an extinction burst — a normal and expected feature of extinction, not a sign of failure. When a previously reinforced behavior suddenly stops working, the animal typically escalates the behavior before abandoning it. This is analogous to pushing an elevator button harder when the elevator doesn't come. The owner should continue withholding all reinforcement during this burst and maintain consistency. The critical mistake would be to give in during the burst, because that would powerfully reinforce the more intense version of the behavior and make the problem worse. The owner should be reassured and encouraged to track frequency so they can see the trend declining over days.
+
+**Answer 3**
+The door-slamming is a behavioral variation within an extinction burst. When one form of the behavior stops producing the reinforcer, the dog is effectively "trying new things" — a predictable consequence of extinction. The key diagnostic question is whether the new behavior (body-slamming) is self-reinforcing or still contingent on staff attention. If staff are still approaching in response to the slamming, extinction has not actually been applied to the new behavior — they have inadvertently reinforced the escalation. The protocol should be extended to cover all variations of door-directed behavior. If the slamming poses a safety risk to the kennel or dog, management (e.g., a barrier or cover) may be needed, and differential reinforcement of an incompatible behavior (like lying on a mat) should be layered in rather than relying on extinction alone.
+
+**Answer 4**
+The colleague is partially correct but overstates the limitation. A truly self-reinforcing behavior — one where the act itself provides the reinforcement regardless of the environment — cannot be extinguished because there is no external reinforcer to remove. However, sock-stealing in this case is not purely self-reinforcing: the chase is a major part of the payoff, and that is socially delivered. If the owner completely stops chasing (extinction of the chase component) and also removes access to socks (antecedent management), the behavior loses much of its reinforcement value. The trainer's approach is sound provided the chase is the primary driver. If the dog also enjoys chewing or shredding the socks independently of the chase, those intrinsic reinforcers remain, and extinction alone will be insufficient — management and redirection to appropriate chew items would need to be added.
+
+**Answer 5**
+Intermittent reinforcement produces behavior that is highly resistant to extinction — this is one of the most robust findings in learning theory. Because the dog has experienced unpredictable payoffs (sometimes giving in, sometimes not), it has learned that persistence is the strategy that eventually works. Under extinction, the dog will therefore show a prolonged extinction burst and a slower overall decline compared to a dog whose behavior was continuously reinforced. The trainer should counsel the client that the process will take longer than expected and that consistency is non-negotiable — a single lapse during extinction will partially reset progress and may reinforce an even more intense variant of the behavior. Management strategies (eating in a separate room, using a tether or baby gate) are important during the extinction period to prevent accidental reinforcement. Differential reinforcement of an incompatible behavior (e.g., rewarding the dog for lying on a mat during meals) should run alongside extinction to accelerate the process and give the dog an alternative path to reinforcement.
+
+**Answer 6**
+The behavior persisting at the park but not at home indicates a stimulus control problem rooted in classical conditioning. The park environment — the sights, sounds, and smells of other dogs — has become a conditioned stimulus that reliably predicts arousal and, historically, social access (playing with other dogs). The demand barking is likely being maintained at the park not just by owner attention but by the environment itself triggering a conditioned emotional state of arousal, and potentially by occasional access to other dogs following the barking. Extinction of the owner's response alone does not address these antecedent stimuli. A revised protocol should: (1) continue ignoring barking at the park with full consistency, (2) apply classical counter-conditioning and desensitization — systematically exposing the dog to other dogs at sub-threshold distance while pairing calm behavior with high-value reinforcement, lowering the overall arousal level the park triggers, and (3) use differential reinforcement to reward calm, quiet behavior before it escalates. The underlying principle is that extinction removes a maintaining consequence, but the conditioned antecedent (park + other dogs) still elicits the emotional and behavioral response — that must be addressed directly through CC/DS.
