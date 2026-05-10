@@ -200,10 +200,15 @@ export function parseDrillCards(
 
   const { content } = matter(practiceContent);
 
-  // Split into Exercises and Answer Key sections
-  const exercisesSectionMatch = content.match(
-    /^## Exercises\s*\n([\s\S]*?)(?=^## Answer Key|$)/m
-  );
+  // Split into Exercises and Answer Key sections.
+  // Try with `## Answer Key` as terminator first; fall back to capturing
+  // everything after `## Exercises` if no Answer Key heading exists.
+  // (A previous version used `(?=^## Answer Key|$)/m`, but with the `m` flag
+  //  `$` matches end of *any* line, so the non-greedy `*?` captured nothing
+  //  past the first newline — leaving every parsed card with an empty question.)
+  const exercisesSectionMatch =
+    content.match(/^## Exercises\s*\n([\s\S]*?)(?=^## Answer Key)/m) ??
+    content.match(/^## Exercises\s*\n([\s\S]*)/m);
   const answerKeySectionMatch = content.match(/^## Answer Key\s*\n([\s\S]*)/m);
 
   if (!exercisesSectionMatch) return [];
