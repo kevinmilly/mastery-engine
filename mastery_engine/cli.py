@@ -110,20 +110,32 @@ def _print_config_status() -> None:
     table.add_column("Models (high / low)")
 
     key_map = {
-        "Anthropic": ("anthropic_api_key", "claude-sonnet-4-6 / claude-haiku-4-5"),
-        "OpenAI":    ("openai_api_key",     "gpt-4o / gpt-4o-mini"),
-        "Gemini":    ("google_api_key",     "gemini-2.5-pro / gemini-2.0-flash"),
+        "Claude Code": (None,                  "sonnet / haiku (via subscription)"),
+        "Anthropic":   ("anthropic_api_key",   "claude-sonnet-4-6 / claude-haiku-4-5"),
+        "OpenAI":      ("openai_api_key",      "gpt-4o / gpt-4o-mini"),
+        "Gemini":      ("google_api_key",      "gemini-2.5-pro / gemini-2.0-flash"),
     }
+
+    from mastery_engine.user_config import claude_code_available
 
     for provider, status_str in status_summary():
         key_name, models = key_map[provider]
-        indicator = "[green]●[/green]" if get_key(key_name) else "[dim]○[/dim]"
+        if key_name is None:
+            active = claude_code_available()
+        else:
+            active = bool(get_key(key_name))
+        indicator = "[green]●[/green]" if active else "[dim]○[/dim]"
         table.add_row(f"{indicator} {provider}", status_str, f"[dim]{models}[/dim]")
 
     console.print(table)
     console.print()
-    active = [p for p, (k, _) in key_map.items() if get_key(k)]
-    chain = " → ".join(active) if active else "[red]No providers configured[/red]"
+    active_providers = []
+    if claude_code_available():
+        active_providers.append("Claude Code")
+    for p, (k, _) in key_map.items():
+        if k and get_key(k):
+            active_providers.append(p)
+    chain = " → ".join(active_providers) if active_providers else "[red]No providers configured[/red]"
     console.print(f"[bold]Fallback chain:[/bold] {chain}")
 
 

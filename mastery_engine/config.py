@@ -21,12 +21,17 @@ OPENAI_LOW  = "gpt-4o-mini"
 CLAUDE_HIGH = "claude-sonnet-4-6"
 CLAUDE_LOW  = "claude-haiku-4-5-20251001"
 
+# Claude Code CLI uses the user's subscription, not the API.
+CLAUDE_CODE_HIGH = "sonnet"
+CLAUDE_CODE_LOW  = "haiku"
+
 # Task → model tier mapping
 HIGH_TASKS = {"lesson", "practice_set", "capstone"}
 LOW_TASKS  = {"syllabus", "repair", "overview", "glossary", "analogy_extraction", "topic_summary"}
 
-# Fallback chain order
-FALLBACK_ORDER = ["gemini", "anthropic", "openai"]
+# Fallback chain order — claude_code first because it bills against the user's
+# subscription instead of metered API credit.
+FALLBACK_ORDER = ["claude_code", "gemini", "anthropic", "openai"]
 
 # ── Retry ─────────────────────────────────────────────────────────────────────
 RETRY_BASE_DELAY = 2

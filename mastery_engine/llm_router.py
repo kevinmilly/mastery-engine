@@ -18,11 +18,13 @@ OpenAI (via API key) is the second fallback.
 
 from mastery_engine import logging_utils as log
 from mastery_engine.adapters.claude_adapter import ClaudeAdapter
+from mastery_engine.adapters.claude_code_adapter import ClaudeCodeAdapter
 from mastery_engine.adapters.gemini_adapter import GeminiAdapter
 from mastery_engine.adapters.openai_adapter import OpenAIAdapter
 from mastery_engine.config import (
     GEMINI_HIGH, GEMINI_LOW,
     CLAUDE_HIGH, CLAUDE_LOW,
+    CLAUDE_CODE_HIGH, CLAUDE_CODE_LOW,
     OPENAI_HIGH, OPENAI_LOW,
     HIGH_TASKS, LOW_TASKS,
     FALLBACK_ORDER,
@@ -36,6 +38,11 @@ class LLMRouter:
         self._configured = configured_providers()
 
         self._adapters: dict[str, tuple] = {}
+        if "claude_code" in self._configured:
+            self._adapters["claude_code"] = (
+                ClaudeCodeAdapter(model=CLAUDE_CODE_HIGH),
+                ClaudeCodeAdapter(model=CLAUDE_CODE_LOW),
+            )
         if "gemini" in self._configured:
             self._adapters["gemini"] = (
                 GeminiAdapter(model=GEMINI_HIGH),

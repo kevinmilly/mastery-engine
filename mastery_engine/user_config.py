@@ -9,8 +9,14 @@ This means a user can override config-file keys with env vars at any time.
 """
 import json
 import os
+import shutil
 from pathlib import Path
 from mastery_engine.config import CONFIG_FILE
+
+
+def claude_code_available() -> bool:
+    """True when the `claude` CLI is on PATH (no API key needed)."""
+    return shutil.which("claude") is not None
 
 
 def _load_config() -> dict:
@@ -57,6 +63,8 @@ def configured_providers() -> list[str]:
     Gemini is primary; Anthropic and OpenAI are fallbacks.
     """
     providers = []
+    if claude_code_available():
+        providers.append("claude_code")
     if get_key("google_api_key"):
         providers.append("gemini")
     if get_key("anthropic_api_key"):
@@ -71,6 +79,11 @@ def status_summary() -> list[tuple[str, str]]:
     Return a list of (provider, status_string) for display in setup/doctor.
     """
     rows = []
+
+    if claude_code_available():
+        rows.append(("Claude Code", f"CLI detected ({shutil.which('claude')})"))
+    else:
+        rows.append(("Claude Code", "CLI not on PATH"))
 
     anthropic_key = get_key("anthropic_api_key")
     if anthropic_key:
